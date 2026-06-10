@@ -1,45 +1,60 @@
-# M365 DLP Rehberi
+# M365 DLP Rehberi v2
 
 Microsoft 365 Data Loss Prevention adım adım yapılandırma rehberi.  
-UnifyTech MSP ekibi için — her müşteri tenantında DLP kurulumunu takip et.
-
-## Özellikler
-
-- **6 aşama, 39+ görev** — Ön hazırlık → SIT → Duyarlılık etiketleri → DLP politikaları → Test → İzleme
-- **Çoklu müşteri** — Her tenant için ayrı oturum, sonsuz müşteri kaydı
-- **Otomatik kayıt** — Tüm ilerleme tarayıcıda localStorage'da saklanır
-- **Lisans filtresi** — E3 / E5 / Business Premium seçimine göre görevler otomatik filtrelenir
-- **Rapor export** — Tamamlanan/kalan görevleri metin rapor olarak kopyala
-- **Dark mode** — Sistem temasını otomatik takip eder
+UnifyTech MSP ekibi — multi-tenant, Supabase Auth, dark theme.
 
 ## Kurulum
+
+### 1. Supabase projesi oluştur
+
+[supabase.com](https://supabase.com) → New project
+
+**SQL Editor'da çalıştır:**
+```sql
+-- supabase-schema.sql dosyasının içeriğini kopyala yapıştır
+```
+
+**Google OAuth (opsiyonel):**
+Supabase Dashboard → Authentication → Providers → Google → Enable
+Client ID ve Secret'ı Google Cloud Console'dan al.
+
+**Redirect URL'i ekle:**
+Supabase → Authentication → URL Configuration →
+`https://PROJE.supabase.co/auth/v1/callback` zaten var.
+Site URL: `https://dlp-guide.vercel.app` ekle.
+
+### 2. .env.local oluştur
+
+```bash
+cp .env.local.example .env.local
+# SUPABASE_URL ve ANON_KEY değerlerini doldur
+# Supabase → Settings → API
+```
+
+### 3. Geliştirme
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Vercel'e Deploy
+## Deploy (Vercel)
 
 ```bash
-git init
 git add .
-git commit -m "feat: M365 DLP rehberi v1"
-git remote add origin https://github.com/KULLANICI/m365-dlp-guide.git
-git push -u origin main
+git commit -m "feat: v2 — Supabase auth + dark theme + PDF export"
+git push
 ```
 
-Ardından [vercel.com](https://vercel.com) → Import Project → GitHub repo seç → Deploy.
+Vercel Dashboard → Project Settings → Environment Variables:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ## Stack
 
 - Next.js 14 (App Router)
-- TypeScript
-- Tailwind CSS
-- localStorage (veri kalıcılığı)
-
-## Geliştirme Notları
-
-- Görev verileri `src/data/phases.ts` dosyasında — kolayca düzenlenebilir
-- Yeni aşama eklemek için `PHASES` dizisine nesne ekle
-- `tags: ['e5']` ile E5-only görev işaretle
+- TypeScript  
+- Tailwind CSS (dark theme)
+- Supabase Auth (email/password + Google)
+- Supabase DB (tenants, task_checks, task_notes)
+- jsPDF + jspdf-autotable (PDF export)
